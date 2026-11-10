@@ -18,3 +18,6 @@ Entruster - New addon GUI HUD to entrust set party members for prebuffing Odysse
 
 
 Fastfollow - Modified. Removed zoning logic and pausing for item / spellcasting.  Info removes clients that aren't loaded when you start a new follow. Any clients not in current zone goto top of info list in smaller text with -- as distance
+
+
+Bazaarlog - Tracks Bazaar sales in a HUD and long term in a CSV file
