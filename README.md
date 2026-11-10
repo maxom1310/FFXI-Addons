@@ -15,3 +15,6 @@ Pouches - Modified with GUI HUD and pause / stop options. Auto-pause when invent
 
 
 Entruster - New addon GUI HUD to entrust set party members for prebuffing Odyssey fights.  It will auto swap to geo if you arent on geo and swap back to original job you were on.
+
+
+Fastfollow - Modified. Removed zoning logic and pausing for item / spellcasting.  Info removes clients that aren't loaded when you start a new follow. Any clients not in current zone goto top of info list in smaller text with -- as distance
