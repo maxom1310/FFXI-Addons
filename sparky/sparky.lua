@@ -7,7 +7,7 @@ packets = require 'packets'
 
 _addon.name = 'Sparky'
 _addon.version = '1'
-_addon.author = 'Byrth Modified with Claude'
+_addon.author = 'Byrth'
 _addon.commands = {'sparky'}
 
 item = 12385 -- Default to Acheron's Shield
@@ -830,12 +830,12 @@ windower.register_event('incoming chunk', function(id, data)
     if id == 0x05C then
         if unity.count == 'peek' then
             if unity.stage == 'item' then
-                unity.stage = 'count'
-                unity_send_choice(powder.item_idx * 32 + 3, 0, true)
-            elseif unity.stage == 'count' then
                 hud.acc_cap = data:unpack('I', 17)
                 hud.acc_time = os.time()
                 hud_update()
+                unity.stage = 'count'
+                unity_send_choice(powder.item_idx * 32 + 3, 0, true)
+            elseif unity.stage == 'count' then
                 unity_finish()
             end
             return true
@@ -854,11 +854,18 @@ windower.register_event('incoming chunk', function(id, data)
             return true
         end
         if unity.stage == 'item' then
+            -- Param 3 of this first event update is the remaining weekly accolade cap (100,000/week).
+            -- (The quantity-stage packet does not always carry it, so read it here.)
+            unity.cap = data:unpack('I', 17)
             unity.stage = 'count'
             unity_send_choice(powder.item_idx * 32 + 3, 0, true)
         elseif unity.stage == 'count' then
-            -- Param 3 of this packet is the remaining weekly accolade cap (100,000/week).
-            local cap = data:unpack('I', 17)
+            local cap = unity.cap
+            if not cap then
+                print('Sparky: Could not read the weekly accolade cap')
+                unity_finish()
+                return true
+            end
             local cap_count = math.floor(cap / powder.cost)
             hud.acc_cap = cap
             hud.acc_time = os.time()
