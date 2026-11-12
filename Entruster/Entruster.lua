@@ -401,6 +401,14 @@ local function run()
 
     local finished = running and not aborted
     restore_jobs()
+
+    -- Started on GEO: make sure Entrust is ready again for the fight.
+    if done > 0 and orig_main == 'GEO' and not wait_until(entrust_ready, 3, true) then
+        set_status('Resetting Entrust...')
+        reset_entrust()
+        restore_jobs()
+    end
+
     running = false
     orig_main, orig_main_id, orig_sub, orig_sub_id = nil, nil, nil, nil
 
