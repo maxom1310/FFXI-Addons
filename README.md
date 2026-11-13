@@ -21,3 +21,6 @@ Fastfollow - Modified. Removed zoning logic and pausing for item / spellcasting.
 
 
 Bazaarlog - Tracks Bazaar sales in a HUD and long term in a CSV file
+
+
+Tradeplayer - Text command to trade your other characters. Modified to have lists of items to trade and an option for everyone (all clients trade one after another the requested trade type)
