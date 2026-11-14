@@ -84,7 +84,6 @@ How it works:
 - A character is skipped if it is missing an item, can't find the target (out of range), has a trade rejected, or is already busy. A character that stalls is skipped after 180 seconds.
 - A quantity is traded per character. `12` means each character tries to give 12, and `all` means each gives everything it has.
 - The player name is required, and it can't be `party` or `ally`.
-- Every character reads its own `lists/` folder. If your characters run from separate Windower installs, copy the `lists` folder to each.
 - The player receiving the trades needs to accept them, either manually or with another addon.
 
 ## Installation
