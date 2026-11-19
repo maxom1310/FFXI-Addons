@@ -27,4 +27,3 @@ Run `//armor help` for chat commands, including `//armor need` for a shopping li
 - **Author** Maxom
 - **Recipe data** Adapted from Reforge by Opo-Opo and [BG Wiki](https://www.bg-wiki.com/)
 - **Auction House and vendor listings** [FFXIAH](https://www.ffxiah.com/)
-- **Dynamis drop references** [PegasusXI Wiki](https://pegasusxi.com/wiki/Category:Relic_Armor)
