@@ -24,3 +24,5 @@ Bazaarlog - Tracks Bazaar sales in a HUD and long term in a CSV file
 
 
 Tradeplayer - Text command to trade your other characters. Modified to have lists of items to trade and an option for everyone (all clients trade one after another the requested trade type)
+
+ArmorLedger - New Addon Tracks all AF, Relic, Empy you have cards, unlocks, materials needed to upgrade everything. All in a GUI HUD
