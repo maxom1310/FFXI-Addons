@@ -1,89 +1,173 @@
 # LimbusBar
 
-A [Windower 4](https://www.windower.net/) addon for Temenos and Apollyon (Limbus). It shows the floor's progress bar on screen, estimates how many kills are left to fill it, marks a floor as completed once you hold its temp item, and can run a command of your choice when the bar passes a percentage.
+An on-screen progress bar for **Temenos** and **Apollyon** floors (Windower 4).
 
-The addon only reads incoming packets. It never sends anything itself; the only thing it ever runs is the command you give it with `//lb auto`.
+It shows how full the floor's bar is, how much each kill adds, and turns a different color once you have the floor's **temp item**. It can also run a command for you at the right moment, like using an item or sending a message.
+
+---
 
 ## Install
 
-1. Put `limbusbar.lua` in `Windower4/addons/limbusbar/`.
-2. Load it with `//lua load limbusbar` (add `lua load limbusbar` to your `init.txt` to load it automatically).
-3. The commands are `//limbusbar` or `//lb`.
+1. Put everything in `Windower4/addons/limbusbar/`:
+   - `limbusbar.lua`
+   - `bg_body.png`
+   - `bg_cap.png`
+   - `fg_body.png`
+2. In game, type:  `//lua load limbusbar`
+
+To load it every time you start the game, add `lua load limbusbar` to your Windower `init.txt`.
+
+Use either `//limbusbar` or the short form `//lb` for every command below.
+
+---
 
 ## What you see
 
-The bar appears automatically in Temenos and Apollyon and hides when you leave:
-
 ```
- North_Tower_F1: 42 / 100 (42%)
- [||||||||||||||..................]
- last kill: +21 | ~3 kills to full | ~5 per bar
+East_Tower_F2: 61 / 100 (61%) - Floor completed *
+[██████████████░░░░░░░░░░]
+Last kill: +9% | ~5 kills to full | ~12 per bar
 ```
 
-- The bar is red below 33%, yellow below 66%, and green from 66%.
-- **Kill line:** each time the bar goes up, the increase is recorded as the last kill's gain. "Kills to full" is the points remaining divided by that gain, rounded up. "Per bar" is the same calculation from 0: how many kills a whole bar takes at that gain. It measures again on every new floor. It counts bar increases rather than mobs, so treat it as an estimate. It corrects itself on the next single kill.
-- **Floor completed:** if the temp item for the floor you're on is already in your temporary items bag, the bar and all the text turn cyan and the header reads `- Floor completed *`.
+| Part | Meaning |
+|------|---------|
+| Top line | Floor name, bar value, and percent. `Floor completed *` appears once you have the temp item. |
+| The bar | Fill color changes as it fills (see below). |
+| Bottom line | How much the last kill added, how many more kills to fill the bar, and roughly how many kills a full bar takes. |
 
-## Commands
+**Bar colors**
+
+| Color | Meaning |
+|-------|---------|
+| Red | Under 33% |
+| Yellow | 33% to 65% |
+| Green | 66% and up |
+| Cyan or blue | You have this floor's temp item |
+
+The bar only appears inside Temenos and Apollyon. It shows up as soon as the game sends the bar value (usually right after you enter a floor).
+
+**Move it:** click and drag the top line with your mouse. The bar and bottom line follow.
+
+---
+
+## Everyday commands
 
 | Command | What it does |
-| --- | --- |
-| `//lb hide` / `//lb show` | Hide or show the bar. |
-| `//lb kills on` / `off` | Show or hide the last-kill / kills-to-full line (on by default). |
-| `//lb width <n>` | Bar length in characters (default 30). |
-| `//lb test <n>` | Preview the bar at value `n` anywhere. Run it twice (e.g. `21` then `42`) to preview the kill line. |
-| `//lb test <n> done` | Preview the cyan Floor completed look. |
-| `//lb auto <command>` | Run `<command>` once when the bar is over 50% **and** this floor's temp item is already held. |
-| `//lb auto <n> <command>` | Same, at `n`% instead of 50%. |
-| `//lb auto <n>` | Change the percentage only, keeping the current command. |
-| `//lb auto` | Show the auto trigger status. |
-| `//lb auto off` | Turn the auto trigger off. |
-| `//lb complete <command>` | Run `<command>` once when the temp item for the floor you're on is **gained** (the bar filled and the item arrived). |
-| `//lb complete` / `//lb complete off` | Show the status / turn it off. |
-| `//lb autotemp off` / `on` | `off` ignores the temp item and fires on the bar percentage alone (useful for testing before you have a temp item). `on` requires it (default). |
-| `//lb floor` | Diagnostic: shows the floor name read from the packet, the floor it maps to, its temp item ID, and whether you hold it. |
-| `//lb help` | List the commands. |
+|---------|--------------|
+| `//lb hide` | Hide the bar |
+| `//lb show` | Bring it back |
+| `//lb kills off` | Hide the "Last kill" line |
+| `//lb kills on` | Show it again |
+| `//lb floor` | Shows which floor the addon thinks you're on and whether it sees your temp item. Good for troubleshooting. |
+| `//lb reset` | Put the box back in its default spot (use this if it ever ends up off screen) |
 
-You can drag the bar with the mouse. The position and width are saved to `addons/limbusbar/data/settings.xml`.
+---
 
-### Auto trigger
+## Try it without being in Limbus
+
+Handy for checking how it looks or tuning the layout.
+
+| Command | What it does |
+|---------|--------------|
+| `//lb test 50` | Show the bar at 50% with a random kill amount |
+| `//lb test 80 done` | Preview the "Floor completed" look |
+| `//lb test random` | Random value and random kill amount, sometimes "Floor completed" |
+
+The preview clears when you zone.
+
+---
+
+## Automatic actions
+
+LimbusBar can run any game command for you. Two triggers are available.
+
+### Run a command when the temp item is gained
 
 ```
-//lb auto input /echo Floor bar over 50%
+//lb complete <command>
+```
+
+Example:
+
+```
+//lb complete input /p Temp item got, ready to move!
+```
+
+It runs once when you gain the floor's temp item. It will not run if you already had the item before you set it.
+
+| Command | What it does |
+|---------|--------------|
+| `//lb complete` | Show the current setting |
+| `//lb complete off` | Turn it off |
+| `//lb complete sound on` or `off` | Play a chime when it fires |
+
+### Run a command when the bar passes a percentage
+
+```
+//lb auto <command>
+//lb auto <percent> <command>
+```
+
+Examples:
+
+```
+//lb auto input /p Bar is past halfway
 //lb auto 70 input /ma "Cure" <me>
 ```
 
-- `<command>` is any Windower console command. Game commands go through `input`.
-- It fires **once per crossing**, then stays quiet until the bar drops back to the threshold or below (the bar empties when it fills) or you zone, which re-arms it.
-- With the temp item check on (default), nothing fires on floors where you don't already hold that floor's temp item, or on floors that don't give one (such as the final Central floors).
-- With `//lb autotemp off` it works in Temenos and Apollyon only, and fires as soon as the bar is over the threshold.
+By default it triggers when the bar goes above **50%** and you have the floor's temp item. It fires once, then re-arms for the next floor.
 
-### Floor complete trigger
+| Command | What it does |
+|---------|--------------|
+| `//lb auto` | Show the current setting |
+| `//lb auto 70` | Change the percentage without changing the command |
+| `//lb auto off` | Turn it off |
+| `//lb autotemp off` | Fire on bar percent alone, without needing the temp item (good for testing) |
+| `//lb autotemp on` | Require the temp item again (default) |
+| `//lb auto sound on` or `off` | Play a chime when it fires |
+
+### Keep your automatic actions after reloading
 
 ```
-//lb complete input /echo Floor done!
+//lb save
 ```
 
-- It fires **once**, at the moment the temp item for your current floor goes from not held to held.
-- The first check on each floor only records whether you already hold the item. Setting the trigger, entering a floor, or zoning while you already have the item never fires it.
-- If the bar fills but you already held the floor's temp item, you get units instead of an item. Nothing fires in that case. Use `//lb auto` if you want a command in that situation.
-- It does not poll. It looks at your temporary items bag only shortly after an item packet arrives. It reads the game's local memory and sends nothing to the server.
-- Like `//lb auto`, it depends on the floor name being recognized (see Known limitations). It does not need `//lb auto` to be on.
+Without this, your `auto` and `complete` setups are forgotten when you unload the addon.
 
-## How it works
+---
 
-- The floor bar comes from packet `0x075` (172 bytes, type byte `0x02` at offset 36). The bar value is a 4-byte little-endian number at offset 60, on a scale of 0 to 100. The floor name is a string at offset 64.
-- The bar is read only in Temenos (zone 37) and Apollyon (zone 38).
-- Temp item IDs are the ones used by Superwarp's `limbus.lua`. The floor name from the packet is mapped to a floor (`North_Tower_F1` → N1, `Center_Tower_F2` → C2, `NW_Floor_#1` → NW1) and then to its item ID. The addon checks your temporary items bag (bag 3) for that item ID, and also for the item's in-game name (`Tem. C-F1`, `Apollyon NW #1`), so a wrong ID can't hide an item you hold.
+## Change how it looks
 
-## Known limitations
+All of these take effect right away.
 
-- The floor name mapping has been confirmed for Temenos `North_Tower_F1` and `Center_Tower_F2` and Apollyon `NW_Floor_#1`. The other floors follow the same naming pattern but are unconfirmed. If a floor name isn't recognized while the auto trigger needs it, you get a single warning with the exact name. Please report it.
-- The final Central floors (Temenos Central B1 and Central Apollyon) have no temp item, and their floor names are unconfirmed.
-- Kills to full is based on the last kill's bar gain, so it can be off when several mobs die at once or the bar moves for another reason.
-- The bar value and the temp item check cover only the floor you're currently on.
+| Command | What it does |
+|---------|--------------|
+| `//lb width 30` | Bar length. Bigger number means a longer bar. |
+| `//lb barheight 20` | Bar thickness in pixels (6 to 40). It grows downward. |
+| `//lb baroffset 19` | Move the bar up or down inside the box |
+| `//lb killsdrop 3` | Push the "Last kill" line down by this many pixels |
+| `//lb font Lucida Console` | Change the text font (it must be installed on your PC) |
+| `//lb fontsize 11` | Change the text size (6 to 40) |
+| `//lb boxalpha 0` | Background transparency: 0 is invisible, 255 is solid |
+| `//lb barbg 180 200 255` | Color of the empty part of the bar (red green blue, 0 to 255) |
 
-## Credits
+**Saved automatically:** width, font, font size, background transparency, bar background color, and box position.
 
-- Written by maxom.
-- Floor temp item IDs from Superwarp's `limbus.lua`.
+**Not saved (back to defaults after a reload):** bar height, bar offset, and kills drop. If you find numbers you like, edit the defaults near the top of `limbusbar.lua`.
+
+**If the bar looks misaligned** after changing the font or size, use `//lb baroffset` to move it up or down, and `//lb killsdrop` to space the bottom line.
+
+---
+
+## Troubleshooting
+
+| Problem | Try this |
+|---------|----------|
+| Nothing shows up | Check you are in Temenos or Apollyon. Run `//lb test 50` to confirm the addon is working. |
+| Bar is missing but the text shows | Check the three PNG files are in the addon folder with exactly these names: `bg_body.png`, `bg_cap.png`, `fg_body.png` |
+| The box is off screen | `//lb reset` |
+| Wrong floor or temp item not detected | `//lb floor` shows what the addon sees. If it says the floor is not recognized, report the floor name it prints. |
+| Odd symbols in the text | Your font may not support a character. Try `//lb font Lucida Console`. |
+| Something else looks wrong | `//lb debug` prints positions and sizes to the console, useful when asking for help. |
+
+Type `//lb` with no command to see the full command list in game.
